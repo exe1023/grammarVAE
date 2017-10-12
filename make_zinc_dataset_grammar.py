@@ -8,9 +8,11 @@ import molecule_vae
 
 
 
-f = open('data/250k_rndm_zinc_drugs_clean.smi','r')
-L = []
+smi_file = '../../dropbox/data/dearomatic/250k_rndm_zinc_drugs_clean_dearomatic.smi'
+dataset_file = '../../dropbox/grammar_vae/reproduce/zinc_str_dataset.h5'
 
+f = open(smi_file,'r')
+L = []
 count = -1
 for line in f:
     line = line.strip()
@@ -46,6 +48,6 @@ for i in range(0, len(L), 100):
     onehot = to_one_hot(L[i:i+100])
     OH[i:i+100,:,:] = onehot
 
-h5f = h5py.File('zinc_grammar_dataset.h5','w')
+h5f = h5py.File(dataset_file,'w')
 h5f.create_dataset('data', data=OH)
 h5f.close()

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 import numpy as np
 import pdb
@@ -6,8 +6,11 @@ from models.utils import many_one_hot
 import h5py
 from tqdm import tqdm
 
-f = open('data/250k_rndm_zinc_drugs_clean.smi','r')
 
+smi_file = '../../dropbox/data/dearomatic/250k_rndm_zinc_drugs_clean_dearomatic.smi'
+dataset_file = '../../dropbox/grammar_vae/reproduce/zinc_str_dataset.h5'
+
+f = open(smi_file,'r')
 L = []
 chars = ['C', '(', ')', 'c', '1', '2', 'o', '=', 'O', 'N', '3', 'F', '[', '@', 'H', ']', 'n', '-', '#', 'S', 'l', '+', 's', 'B', 'r', '/', '4', '\\', '5', '6', '7', 'I', 'P', '8', ' ']
 DIM = len(chars)
@@ -30,7 +33,7 @@ for chem in tqdm(L):
     count = count + 1
 
 f.close()
-h5f = h5py.File('zinc_str_dataset.h5','w')
+h5f = h5py.File(dataset_file,'w')
 h5f.create_dataset('data', data=OH)
 h5f.create_dataset('chr',  data=chars)
 h5f.close()
