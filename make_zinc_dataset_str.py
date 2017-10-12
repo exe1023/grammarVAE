@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import pdb
 from models.utils import many_one_hot
 import h5py
+from tqdm import tqdm
 
 f = open('data/250k_rndm_zinc_drugs_clean.smi','r')
 
@@ -16,7 +19,8 @@ f.close()
 count = 0
 MAX_LEN = 120
 OH = np.zeros((249456,MAX_LEN,DIM))
-for chem in L:
+
+for chem in tqdm(L):
     indices = []
     for c in chem:
         indices.append(chars.index(c))
@@ -24,6 +28,7 @@ for chem in L:
         indices.extend((MAX_LEN-len(indices))*[DIM-1])
     OH[count,:,:] = many_one_hot(np.array(indices), DIM)
     count = count + 1
+
 f.close()
 h5f = h5py.File('zinc_str_dataset.h5','w')
 h5f.create_dataset('data', data=OH)
