@@ -1,15 +1,19 @@
+#!/usr/bin/env python
+
 from __future__ import print_function
 import nltk
 import pdb
 import zinc_grammar
 import numpy as np
 import h5py
+from tqdm import tqdm
+from joblib import Parallel, delayed
 import molecule_vae
 
 
 
 smi_file = '../../dropbox/data/dearomatic/250k_rndm_zinc_drugs_clean_dearomatic.smi'
-dataset_file = '../../dropbox/grammar_vae/reproduce/zinc_str_dataset.h5'
+dataset_file = '../../dropbox/grammar_vae/reproduce/zinc_grammar_dataset.h5'
 
 f = open(smi_file,'r')
 L = []
@@ -41,12 +45,24 @@ def to_one_hot(smiles):
         one_hot[i][np.arange(num_productions, MAX_LEN),-1] = 1.
     return one_hot
 
+chunk_size = 5000
+onehots = Parallel(n_jobs=-1, verbose=50)(
+    delayed(to_one_hot)(L[start: start + chunk_size])
+    for start in range(0, len(L), chunk_size)
+)
 
 OH = np.zeros((len(L),MAX_LEN,NCHARS))
-for i in range(0, len(L), 100):
-    print('Processing: i=[' + str(i) + ':' + str(i+100) + ']')
-    onehot = to_one_hot(L[i:i+100])
-    OH[i:i+100,:,:] = onehot
+for start, onehot in zip(
+        range(0, len(L), chunk_size),
+        onehots,
+    ):
+    OH[start: start + chunk_size,:,:] = onehot
+
+#OH = np.zeros((len(L),MAX_LEN,NCHARS))
+#for i in tqdm(list(range(0, len(L), 100))):
+#    # print('Processing: i=[' + str(i) + ':' + str(i+100) + ']')
+#    onehot = to_one_hot(L[i:i+100])
+#    OH[i:i+100,:,:] = onehot
 
 h5f = h5py.File(dataset_file,'w')
 h5f.create_dataset('data', data=OH)

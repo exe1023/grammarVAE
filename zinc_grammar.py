@@ -1,9 +1,13 @@
+#!/usr/bin/env python
+
 import nltk
 import numpy as np
 import six
 import pdb
 
-# the zinc grammar
+grammar_file = '../../dropbox/context_free_grammars/mol_zinc.grammar'
+
+# (the overridden) the zinc grammar
 gram = """smiles -> chain
 atom -> bracket_atom
 atom -> aliphatic_organic
@@ -81,6 +85,12 @@ chain -> chain branched_atom
 chain -> chain bond branched_atom
 Nothing -> None"""
 
+
+rules = [line.strip() for line in open(grammar_file).readlines()]
+rules = [line for line in rules if line]
+rules += ['Nothing -> None']
+gram = '\n'.join(rules)
+
 # form the CFG and get the start symbol
 GCFG = nltk.CFG.fromstring(gram)
 start_index = GCFG.productions()[0].lhs()
@@ -91,7 +101,7 @@ lhs_list = []
 for a in all_lhs:
     if a not in lhs_list:
         lhs_list.append(a)
-
+        
 D = len(GCFG.productions())
 
 # this map tells us the rhs symbol indices for each production rule
@@ -122,7 +132,7 @@ ind_of_ind = np.array(index_array)
 
 max_rhs = max([len(l) for l in rhs_map])
 
-# rules 29 and 31 aren't used in the zinc data so we 
+# rules 29 and 31 aren't used in the zinc data so we
 # 0 their masks so they can never be selected
 masks[:,29] = 0
 masks[:,31] = 0
