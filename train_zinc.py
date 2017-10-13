@@ -12,9 +12,10 @@ import h5py
 import zinc_grammar as G
 import pdb
 
+dataset_file =  '../../dropbox/grammar_vae/reproduce/zinc_grammar_dataset.h5'
+model_save_dir = '../../dropbox/grammar_vae/reproduce/'
 
 rules = G.gram.split('\n')
-
 
 MAX_LEN = 277
 DIM = len(rules)
@@ -36,10 +37,10 @@ def get_arguments():
 
 def main():
     # 0. load dataset
-    h5f = h5py.File('data/zinc_grammar_dataset.h5', 'r')
+    h5f = h5py.File(dataset_file, 'r')
     data = h5f['data'][:]
     h5f.close()
-    
+
     # 1. split into train/test, we use test set to check reconstruction error and the % of
     # samples from prior p(z) that are valid
     XTE = data[0:5000]
@@ -49,7 +50,7 @@ def main():
     # 2. get any arguments and define save file, then create the VAE model
     args = get_arguments()
     print('L='  + str(args.latent_dim) + ' E=' + str(args.epochs))
-    model_save = 'results/zinc_vae_grammar_L' + str(args.latent_dim) + '_E' + str(args.epochs) + '_val.hdf5'
+    model_save = model_save_dir + '/zinc_vae_grammar_L' + str(args.latent_dim) + '_E' + str(args.epochs) + '_val.hdf5'
     print(model_save)
     model = MoleculeVAE()
     print(args.load_model)

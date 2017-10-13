@@ -11,6 +11,9 @@ from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 import h5py
 import pdb
 
+dataset_file = '../../dropbox/grammar_vae/reproduce/zinc_str_dataset.h5'
+model_save_dir = '../../dropbox/grammar_vae/reproduce/'
+
 charset = ['C', '(', ')', 'c', '1', '2', 'o', '=', 'O', 'N', '3', 'F', '[', '@', 'H', ']', 'n', '-', '#', 'S', 'l', '+', 's', 'B', 'r', '/', '4', '\\', '5', '6', '7', 'I', 'P', '8', ' ']
 
 MAX_LEN = 120
@@ -32,7 +35,7 @@ def get_arguments():
 
 def main():
     # 0. load dataset
-    h5f = h5py.File('data/zinc_str_dataset.h5', 'r')
+    h5f = h5py.File(dataset_file, 'r')
     data = h5f['data'][:]
     h5f.close()
 
@@ -44,7 +47,7 @@ def main():
     np.random.seed(1)
     # 2. get any arguments and define save file, then create the VAE model
     args = get_arguments()
-    model_save = 'results/zinc_vae_str_L' + str(args.latent_dim) + '_E' + str(args.epochs) + '_val.hdf5'
+    model_save = model_save_dir + '/zinc_vae_str_L' + str(args.latent_dim) + '_E' + str(args.epochs) + '_val.hdf5'
     print(model_save)
     model = MoleculeVAE()
     print(args.load_model)
