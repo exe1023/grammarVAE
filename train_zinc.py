@@ -21,7 +21,8 @@ MAX_LEN = 277
 DIM = len(rules)
 LATENT = 56
 EPOCHS = 100
-BATCH = 500
+# BATCH = 500  # OOM on GPU
+BATCH = 400
 
 
 
