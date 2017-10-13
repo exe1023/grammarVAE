@@ -21,14 +21,14 @@ DIM = G.D
 class MoleculeVAE():
 
     autoencoder = None
-    
+
     def create(self,
                charset,
                max_length = MAX_LEN,
                latent_rep_size = 2,
                weights_file = None):
         charset_length = len(charset)
-        
+
         x = Input(shape=(max_length, charset_length))
         _, z = self._buildEncoder(x, latent_rep_size, max_length)
         self.encoder = Model(x, z)
@@ -82,7 +82,7 @@ class MoleculeVAE():
         z_mean = Dense(latent_rep_size, name='z_mean', activation = 'linear')(h)
         z_log_var = Dense(latent_rep_size, name='z_log_var', activation = 'linear')(h)
 
-        return (z_mean, z_log_var) 
+        return (z_mean, z_log_var)
 
 
     def _buildEncoder(self, x, latent_rep_size, max_length, epsilon_std = 0.01):
@@ -106,11 +106,12 @@ class MoleculeVAE():
         #   future rules based on the current non-terminal
         def conditional(x_true, x_pred):
             most_likely = K.argmax(x_true)
-            most_likely = tf.reshape(most_likely,[-1]) # flatten most_likely
+            most_likely = tf.reshape(most_likely,[-1]) # flatten most_likely]
             ix2 = tf.expand_dims(tf.gather(ind_of_ind_K, most_likely),1) # index ind_of_ind with res
-            ix2 = tf.cast(ix2, tf.int32) # cast indices as ints 
+            ix2 = tf.cast(ix2, tf.int32) # cast indices as ints
             M2 = tf.gather_nd(masks_K, ix2) # get slices of masks_K with indices
             M3 = tf.reshape(M2, [-1,MAX_LEN,DIM]) # reshape them
+            # M3 = tf.Print(M3, [x_pred, most_likely, ix2, M2, M3], message='some debug info...')
             P2 = tf.mul(K.exp(x_pred),M3) # apply them to the exp-predictions
             P2 = tf.div(P2,K.sum(P2,axis=-1,keepdims=True)) # normalize predictions
             return P2
@@ -135,6 +136,6 @@ class MoleculeVAE():
 
     def save(self, filename):
         self.autoencoder.save_weights(filename)
-    
+
     def load(self, charset, weights_file, latent_rep_size = 2, max_length=MAX_LEN):
         self.create(charset, max_length = max_length, weights_file = weights_file, latent_rep_size = latent_rep_size)

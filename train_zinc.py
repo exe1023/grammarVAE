@@ -83,4 +83,10 @@ def main():
         validation_split = 0.1)
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except:
+        import sys, pdb, traceback
+        type, value, tb = sys.exc_info()
+        traceback.print_exc()
+        pdb.post_mortem(tb)

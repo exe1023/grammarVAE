@@ -7,10 +7,21 @@ import pdb
 
 grammar_file = '../../dropbox/context_free_grammars/mol_zinc.grammar'
 
-rules = [line.strip() for line in open(grammar_file).readlines()]
-rules = [line for line in rules if line]
-rules += ['Nothing -> None']
-gram = '\n'.join(rules)
+def load_gram(f):
+    rules = [line.strip() for line in open(grammar_file).readlines()]
+    rules = [line for line in rules if line]
+    # now rules can be X -> Y | Z
+    # split to X -> Y\nX->Z
+    rules2 = []
+    for r in rules:
+        head, tail = r.split('->')
+        tails = tail.split('|')
+        for t in tails:
+            rules2.append('%s -> %s' % (head.strip(' '), t.strip(' ')))
+    rules2 += ['Nothing -> None']
+    return '\n'.join(rules2)
+
+gram = load_gram(grammar_file)
 
 # form the CFG and get the start symbol
 GCFG = nltk.CFG.fromstring(gram)
@@ -55,5 +66,5 @@ max_rhs = max([len(l) for l in rhs_map])
 
 # rules 29 and 31 aren't used in the zinc data so we
 # 0 their masks so they can never be selected
-masks[:,29] = 0
-masks[:,31] = 0
+#masks[:,29] = 0
+#masks[:,31] = 0
